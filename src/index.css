@@ -495,3 +495,362 @@ body {
 .btn-send:hover {
   background: #1d4ed8;
 }
+
+/* ===================== */
+/* Group View Screen */
+/* ===================== */
+#group-view-screen {
+  background-color: var(--dark-bg);
+}
+
+.group-view-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.quick-access-section h4,
+.members-section h4 {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.quick-access-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.quick-access-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem;
+  background: white;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.quick-access-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.quick-access-btn .quick-icon {
+  font-size: 2rem;
+}
+
+.tasks-btn {
+  border-left: 4px solid var(--accent-1);
+}
+
+.doc-btn {
+  border-left: 4px solid var(--accent-2);
+}
+
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.member-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.member-avatar {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.member-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.member-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.member-role {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ===================== */
+/* Tasks Screen */
+/* ===================== */
+#tasks-screen {
+  background-color: var(--dark-bg);
+}
+
+.tasks-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.task-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.task-info {
+  flex: 1;
+}
+
+.task-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.task-responsible {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.status-badge {
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.2s;
+}
+
+.status-badge:hover {
+  opacity: 0.85;
+}
+
+.status-badge:active {
+  transform: scale(0.95);
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-in-progress {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-completed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+/* ===================== */
+/* Document Screen */
+/* ===================== */
+#document-screen {
+  background-color: var(--dark-bg);
+}
+
+.document-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  gap: 1rem;
+}
+
+.active-users-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.users-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.active-user-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  background: #f8fafc;
+  border: 1.5px solid;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.user-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.active-users {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.active-user-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: default;
+}
+
+.document-editor {
+  flex: 1;
+  padding: 1.5rem;
+  background: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  line-height: 1.7;
+  resize: none;
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.document-editor:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary-light), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* ===================== */
+/* Announcements Section */
+/* ===================== */
+.announcements-section h4,
+.materials-section h4 {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.announcements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.announcement-card {
+  padding: 0.9rem 1rem;
+  background: white;
+  border-radius: 10px;
+  border-left: 4px solid var(--accent-1);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.announcement-card.urgent {
+  background: #fef3c7;
+  border-left-color: #f59e0b;
+  font-weight: 500;
+}
+
+/* ===================== */
+/* Materials Section */
+/* ===================== */
+.materials-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.material-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.material-card:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.material-icon {
+  font-size: 1.3rem;
+}
+
+.material-name {
+  flex: 1;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.material-type {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  background: #e2e8f0;
+  color: var(--text-secondary);
+  border-radius: 4px;
+}

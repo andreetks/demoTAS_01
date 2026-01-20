@@ -25,7 +25,7 @@ export default function Login({ onLogin }) {
                 <form id="login-form" onSubmit={handleSubmit}>
                     <div className="input-group">
                         <label htmlFor="email">Correo Institucional</label>
-                        <input type="email" id="email" placeholder="estudiante@uni.edu" required />
+                        <input type="text" id="email" placeholder="estudiante@uni.edu" />
                     </div>
                     <div className="input-group">
                         <label htmlFor="password">Contraseña</label>
