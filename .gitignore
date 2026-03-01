@@ -1,16 +1,16 @@
 # Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+tas-frontend/logs
+tas-frontend/*.log
+tas-frontend/npm-debug.log*
+tas-frontend/yarn-debug.log*
+tas-frontend/yarn-error.log*
+tas-frontend/pnpm-debug.log*
+tas-frontend/lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+tas-frontend/node_modules
+tas-frontend/dist
+tas-frontend/dist-ssr
+tas-frontend/*.local
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+tas-backend/node_modules
+# Keep environment variables out of version control
+tas-backend/.env
+
+tas-backend/dist/
+
+tas-backend/generated/prisma
+
