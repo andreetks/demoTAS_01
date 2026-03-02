@@ -7,13 +7,12 @@ import { UpdateDocumentUseCase } from './application/use-cases/update-document.u
 import { DeleteDocumentUseCase } from './application/use-cases/delete-document.use-case';
 import { PrismaDocumentRepository } from './infrastructure/repositories/prisma-document.repository';
 import { DOCUMENT_REPOSITORY } from './domain/interfaces/document.repository.interface';
-
-// Asegúrate de importar el PrismaModule real
-// import { PrismaModule } from '../shared/infrastructure/prisma/prisma.module';
+import { SharedModule } from '../shared/shared.module';
 
 @Module({
-    // imports: [PrismaModule],
+    imports: [SharedModule],
     controllers: [DocumentsController],
+
     providers: [
         CreateDocumentUseCase,
         GetDocumentUseCase,

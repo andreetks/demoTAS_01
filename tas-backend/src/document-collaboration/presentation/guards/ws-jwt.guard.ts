@@ -1,20 +1,29 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
 import { Socket } from 'socket.io';
 
 @Injectable()
 export class WsJwtGuard implements CanActivate {
+    constructor(private readonly jwtService: JwtService) { }
+
     canActivate(
         context: ExecutionContext,
     ): boolean | Promise<boolean> | Observable<boolean> {
         const client: Socket = context.switchToWs().getClient();
 
-        // MOCK: Aquí iría la lógica real para extraer y verificar el JWT
-        // const token = client.handshake.headers.authorization;
+        const token =
+            client.handshake.auth?.token ||
+            client.handshake.headers?.authorization?.replace('Bearer ', '');
 
-        // Simulamos que pasamos la autenticación anexando un usuario al socket
-        (client as any).user = { id: 'mock-user-id' };
+        if (!token) return false;
 
-        return true;
+        try {
+            const payload = this.jwtService.verify(token);
+            (client as any).user = { id: payload.sub, email: payload.email, role: payload.role };
+            return true;
+        } catch {
+            return false;
+        }
     }
 }

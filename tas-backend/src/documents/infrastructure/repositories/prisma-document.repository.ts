@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { DocumentRepository } from '../../domain/interfaces/document.repository.interface';
 import { Document } from '../../domain/entities/document.entity';
-// Asegúrate de importar tu PrismaService real desde la ruta correcta
-// import { PrismaService } from '../../../shared/infrastructure/prisma/prisma.service';
+import { PrismaService } from '../../../shared/infrastructure/prisma/prisma.service';
 
 @Injectable()
 export class PrismaDocumentRepository implements DocumentRepository {
-    // constructor(private readonly prisma: PrismaService) {}
-    private prisma: any; // MOCK para evitar errores de compilación sin PrismaService real, reemplazar por Inyección de Dependencias correcta
+    constructor(private readonly prisma: PrismaService) { }
+
 
     async create(data: Partial<Document>): Promise<Document> {
         const created = await this.prisma.document.create({
