@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Dashboard({ onOpenChat }) {
+export default function Dashboard({ onOpenChat, onLogout }) {
     const groups = [
         { id: 1, name: 'Taller de Aplicaciones', lastMsg: '¿A qué hora nos...?', time: '10:30', color: 'color-1' },
         { id: 2, name: 'Proyecto Final', lastMsg: 'Archivo adjunto: Entrega.pdf', time: 'Ayer', color: 'color-2' },
@@ -34,6 +34,31 @@ export default function Dashboard({ onOpenChat }) {
 
             <button className="fab-create" title="Crear Grupo">
                 +
+            </button>
+
+            <button
+                title="Cerrar sesión"
+                onClick={onLogout}
+                style={{
+                    position: 'fixed',
+                    bottom: '20px',
+                    left: '20px', /* Al lado izquierdo para no tapar el botón de crear grupo a la derecha */
+                    width: '45px',
+                    height: '45px',
+                    borderRadius: '8px', /* Cuadrado con bordes suaves */
+                    backgroundColor: '#ff4757',
+                    color: 'white',
+                    border: 'none',
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.2rem',
+                    cursor: 'pointer',
+                    zIndex: 100
+                }}
+            >
+                {'🚪'}
             </button>
         </section>
     );

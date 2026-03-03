@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Chat from './components/Chat';
@@ -10,8 +10,20 @@ function App() {
   const [currentScreen, setCurrentScreen] = useState('login');
   const [activeGroup, setActiveGroup] = useState(null);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setCurrentScreen('dashboard');
+    }
+  }, []);
+
   const handleLogin = () => {
     setCurrentScreen('dashboard');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setCurrentScreen('login');
   };
 
   const handleOpenGroup = (groupName) => {
@@ -48,7 +60,7 @@ function App() {
       )}
 
       {currentScreen === 'dashboard' && (
-        <Dashboard onOpenChat={handleOpenGroup} />
+        <Dashboard onOpenChat={handleOpenGroup} onLogout={handleLogout} />
       )}
 
       {currentScreen === 'groupView' && (
