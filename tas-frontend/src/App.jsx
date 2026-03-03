@@ -8,7 +8,8 @@ import CollaborativeDoc from './components/CollaborativeDoc';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('login');
-  const [activeGroup, setActiveGroup] = useState(null);
+  const [activeProject, setActiveProject] = useState(null);
+  const [chatRoom, setChatRoom] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -26,13 +27,26 @@ function App() {
     setCurrentScreen('login');
   };
 
-  const handleOpenGroup = (groupName) => {
-    setActiveGroup(groupName);
+  const handleOpenGroup = (project) => {
+    setActiveProject(project);
     setCurrentScreen('groupView');
   };
 
-  const handleOpenChat = (groupName) => {
-    setActiveGroup(groupName);
+  const handleOpenChat = (project, targetUser = null) => {
+    if (project) {
+      setActiveProject(project);
+    }
+
+    if (targetUser) {
+      // Private chat room ID logic
+      const token = localStorage.getItem('token');
+      const myId = token ? JSON.parse(atob(token.split('.')[1])).sub : 'me';
+      const roomId = [myId, targetUser.id].sort().join('_');
+      setChatRoom({ id: roomId, name: targetUser.name, type: 'private' });
+    } else if (project) {
+      // Group chat room ID is the project ID
+      setChatRoom({ id: project.id, name: project.name, type: 'group' });
+    }
     setCurrentScreen('chat');
   };
 
@@ -46,11 +60,13 @@ function App() {
 
   const handleBackToDashboard = () => {
     setCurrentScreen('dashboard');
-    setActiveGroup(null);
+    setActiveProject(null);
+    setChatRoom(null);
   };
 
   const handleBackToGroupView = () => {
     setCurrentScreen('groupView');
+    setChatRoom(null);
   };
 
   return (
@@ -60,28 +76,37 @@ function App() {
       )}
 
       {currentScreen === 'dashboard' && (
-        <Dashboard onOpenChat={handleOpenGroup} onLogout={handleLogout} />
+        <Dashboard
+          onOpenProject={handleOpenGroup}
+          onOpenPrivateChat={(user) => handleOpenChat(null, user)}
+          onLogout={handleLogout}
+        />
       )}
 
       {currentScreen === 'groupView' && (
         <GroupView
-          groupName={activeGroup}
+          projectId={activeProject?.id}
+          groupName={activeProject?.name}
           onBack={handleBackToDashboard}
           onOpenTasks={handleOpenTasks}
           onOpenDocument={handleOpenDocument}
+          onOpenProjectChat={() => handleOpenChat(activeProject)}
         />
       )}
 
       {currentScreen === 'tasks' && (
-        <Tasks groupName={activeGroup} onBack={handleBackToGroupView} />
+        <Tasks groupName={activeProject?.name} onBack={handleBackToGroupView} />
       )}
 
       {currentScreen === 'document' && (
-        <CollaborativeDoc groupName={activeGroup} onBack={handleBackToGroupView} />
+        <CollaborativeDoc groupName={activeProject?.name} onBack={handleBackToGroupView} />
       )}
 
       {currentScreen === 'chat' && (
-        <Chat groupName={activeGroup} onBack={handleBackToDashboard} />
+        <Chat
+          room={chatRoom}
+          onBack={activeProject && chatRoom?.type === 'group' ? handleBackToGroupView : handleBackToDashboard}
+        />
       )}
     </div>
   );

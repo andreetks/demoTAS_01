@@ -1,70 +1,91 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { documentService } from '../services/documentService';
 
-export default function GroupView({ groupName, onBack, onOpenTasks, onOpenDocument }) {
-    // Datos específicos por grupo
+export default function GroupView({ projectId, groupName, onBack, onOpenTasks, onOpenDocument, onOpenProjectChat }) {
+    const [projectDocs, setProjectDocs] = useState([]);
+    const [loadingDocs, setLoadingDocs] = useState(true);
+
+    useEffect(() => {
+        const fetchDocs = async () => {
+            if (!projectId) return;
+            try {
+                const docs = await documentService.listDocuments(projectId);
+                setProjectDocs(docs);
+            } catch (err) {
+                console.error('Error fetching project documents:', err);
+            } finally {
+                setLoadingDocs(false);
+            }
+        };
+        fetchDocs();
+    }, [projectId]);
+
     const groupData = {
         'Taller de Aplicaciones': {
-            members: [
-                { id: 1, name: 'Alex García', role: 'Líder del equipo', avatar: 'A' },
-                { id: 2, name: 'María López', role: 'Desarrolladora', avatar: 'M' },
-                { id: 3, name: 'Juan Soto', role: 'Diseñador UI', avatar: 'J' },
-                { id: 4, name: 'Ana Torres', role: 'QA Tester', avatar: 'AT' },
-            ],
             description: 'Desarrollo de aplicaciones móviles',
             materials: [
-                { id: 1, name: 'Guía de React Native', type: 'pdf', icon: '📕' },
-                { id: 2, name: 'Plantilla del Proyecto', type: 'zip', icon: '📦' },
-                { id: 3, name: 'Video: Intro a Firebase', type: 'video', icon: '🎬' },
+                { id: 'm1', name: 'Guía de React Native', type: 'pdf', icon: '📕' },
+                { id: 'm2', name: 'Plantilla del Proyecto', type: 'zip', icon: '📦' },
+                { id: 'm3', name: 'Video: Intro a Firebase', type: 'video', icon: '🎬' },
             ],
             announcements: [
-                { id: 1, text: 'Entrega del sprint 2: Viernes 24 Ene', urgent: true },
-                { id: 2, text: 'Reunión de equipo: Miércoles 3pm', urgent: false },
+                { id: 'a1', text: 'Entrega del sprint 2: Viernes 24 Ene', urgent: true },
+                { id: 'a2', text: 'Reunión de equipo: Miércoles 3pm', urgent: false },
             ]
         },
         'Proyecto Final': {
-            members: [
-                { id: 1, name: 'Alex García', role: 'Coordinador', avatar: 'A' },
-                { id: 2, name: 'Carlos Ruiz', role: 'Investigador', avatar: 'C' },
-                { id: 3, name: 'Diana Paz', role: 'Redactora', avatar: 'D' },
-            ],
             description: 'Tesis: Sistema de Gestión Académica',
             materials: [
-                { id: 1, name: 'Formato APA 7ma Ed.', type: 'pdf', icon: '📕' },
-                { id: 2, name: 'Plantilla de Tesis', type: 'doc', icon: '📄' },
-                { id: 3, name: 'Bibliografía recomendada', type: 'pdf', icon: '📚' },
+                { id: 'm1', name: 'Formato APA 7ma Ed.', type: 'pdf', icon: '📕' },
+                { id: 'm2', name: 'Plantilla de Tesis', type: 'doc', icon: '📄' },
+                { id: 'm3', name: 'Bibliografía recomendada', type: 'pdf', icon: '📚' },
             ],
             announcements: [
-                { id: 1, text: 'Revisión con asesor: Lunes 27 Ene', urgent: true },
-                { id: 2, text: 'Avance Cap. 3 para la próxima semana', urgent: false },
+                { id: 'a1', text: 'Revisión con asesor: Lunes 27 Ene', urgent: true },
+                { id: 'a2', text: 'Avance Cap. 3 para la próxima semana', urgent: false },
             ]
         },
         'Matemáticas III': {
-            members: [
-                { id: 1, name: 'Prof. Rodríguez', role: 'Docente', avatar: 'PR' },
-                { id: 2, name: 'Alex García', role: 'Estudiante', avatar: 'A' },
-                { id: 3, name: 'Luis Mendez', role: 'Estudiante', avatar: 'L' },
-                { id: 4, name: 'Sara Vega', role: 'Estudiante', avatar: 'S' },
-                { id: 5, name: 'Pedro Castillo', role: 'Estudiante', avatar: 'PC' },
-            ],
             description: 'Cálculo Multivariable - Sección A',
             materials: [
-                { id: 1, name: 'Cálculo de Stewart - Cap. 15', type: 'pdf', icon: '📕' },
-                { id: 2, name: 'Formulario de Integrales', type: 'pdf', icon: '📋' },
-                { id: 3, name: 'Ejercicios Resueltos Sem. 5', type: 'pdf', icon: '📝' },
-                { id: 4, name: 'Video: Integrales Dobles', type: 'video', icon: '🎬' },
+                { id: 'm1', name: 'Cálculo de Stewart - Cap. 15', type: 'pdf', icon: '📕' },
+                { id: 'm2', name: 'Formulario de Integrales', type: 'pdf', icon: '📋' },
+                { id: 'm3', name: 'Ejercicios Resueltos Sem. 5', type: 'pdf', icon: '📝' },
+                { id: 'm4', name: 'Video: Integrales Dobles', type: 'video', icon: '🎬' },
             ],
             announcements: [
-                { id: 1, text: '⚠️ Examen Parcial: Sábado 25 Ene - 9am', urgent: true },
-                { id: 2, text: 'Tarea 5 entrega: Jueves 23 Ene', urgent: true },
-                { id: 3, text: 'Horario de consultas: Mar y Jue 4-6pm', urgent: false },
+                { id: 'a1', text: '⚠️ Examen Parcial: Sábado 25 Ene - 9am', urgent: true },
+                { id: 'a2', text: 'Tarea 5 entrega: Jueves 23 Ene', urgent: true },
+                { id: 'a3', text: 'Horario de consultas: Mar y Jue 4-6pm', urgent: false },
             ]
         }
     };
 
-    const currentGroup = groupData[groupName] || groupData['Taller de Aplicaciones'];
-    const members = currentGroup.members;
-    const materials = currentGroup.materials || [];
-    const announcements = currentGroup.announcements || [];
+    // Default values if no mock data exists for this specific groupName
+    const defaultInfo = {
+        description: 'Proyecto colaborativo de este grupo',
+        materials: [
+            { id: 'd-m1', name: 'Guía General del Curso', type: 'pdf', icon: '📕' },
+            { id: 'd-m2', name: 'Cronograma de actividades', type: 'doc', icon: '📝' },
+        ],
+        announcements: [
+            { id: 'd-a1', text: 'Bienvenido al grupo. Coordina tus entregas aquí.', urgent: false },
+        ]
+    };
+
+    const specificGroup = groupData[groupName] || defaultInfo;
+    const announcements = specificGroup.announcements;
+
+    // Combine mock materials with real project documents
+    const combinedMaterials = [
+        ...specificGroup.materials,
+        ...projectDocs.map(doc => ({
+            id: doc.id,
+            name: doc.title,
+            type: 'doc',
+            icon: '📄'
+        }))
+    ];
 
     return (
         <section id="group-view-screen" className="screen active">
@@ -76,16 +97,15 @@ export default function GroupView({ groupName, onBack, onOpenTasks, onOpenDocume
                 </button>
                 <div className="chat-header-info">
                     <h3>{groupName}</h3>
-                    <p>{currentGroup.description}</p>
+                    <p>{specificGroup.description}</p>
                 </div>
                 <div className="more-options">•••</div>
             </header>
 
             <div className="group-view-content">
-                {/* Accesos Rápidos */}
                 <div className="quick-access-section">
                     <h4>Accesos Rápidos</h4>
-                    <div className="quick-access-buttons">
+                    <div className="quick-access-buttons" style={{ flexWrap: 'wrap' }}>
                         <button className="quick-access-btn tasks-btn" onClick={onOpenTasks}>
                             <span className="quick-icon">📋</span>
                             <span>Tareas</span>
@@ -94,10 +114,13 @@ export default function GroupView({ groupName, onBack, onOpenTasks, onOpenDocume
                             <span className="quick-icon">📄</span>
                             <span>Documento</span>
                         </button>
+                        <button className="quick-access-btn chat-btn" onClick={onOpenProjectChat} style={{ borderLeft: '4px solid var(--primary-color)' }}>
+                            <span className="quick-icon">💬</span>
+                            <span>Chat</span>
+                        </button>
                     </div>
                 </div>
 
-                {/* Tablón de Anuncios / Pendientes */}
                 {announcements.length > 0 && (
                     <div className="announcements-section">
                         <h4>📌 Pendientes y Anuncios</h4>
@@ -111,35 +134,22 @@ export default function GroupView({ groupName, onBack, onOpenTasks, onOpenDocume
                     </div>
                 )}
 
-                {/* Materiales del Curso */}
-                {materials.length > 0 && (
-                    <div className="materials-section">
-                        <h4>📚 Materiales</h4>
-                        <div className="materials-list">
-                            {materials.map((material) => (
+                <div className="materials-section">
+                    <h4>📚 Materiales y Documentos</h4>
+                    <div className="materials-list">
+                        {loadingDocs && projectDocs.length === 0 && specificGroup.materials.length === 0 ? (
+                            <p style={{ color: 'var(--text-secondary)', padding: '1rem' }}>Cargando materiales...</p>
+                        ) : combinedMaterials.length === 0 ? (
+                            <p style={{ color: 'var(--text-secondary)', padding: '1rem' }}>No hay materiales disponibles.</p>
+                        ) : (
+                            combinedMaterials.map((material) => (
                                 <div key={material.id} className="material-card">
                                     <span className="material-icon">{material.icon}</span>
                                     <span className="material-name">{material.name}</span>
                                     <span className="material-type">{material.type.toUpperCase()}</span>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Lista de Miembros */}
-                <div className="members-section">
-                    <h4>👥 Miembros ({members.length})</h4>
-                    <div className="members-list">
-                        {members.map((member) => (
-                            <div key={member.id} className="member-card">
-                                <div className="member-avatar">{member.avatar}</div>
-                                <div className="member-info">
-                                    <span className="member-name">{member.name}</span>
-                                    <span className="member-role">{member.role}</span>
-                                </div>
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </div>
                 </div>
             </div>

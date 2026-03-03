@@ -24,7 +24,13 @@ export default function Tasks({ groupName, onBack }) {
         ]
     };
 
-    const [tasks, setTasks] = useState(tasksByGroup[groupName] || tasksByGroup['Taller de Aplicaciones']);
+    const defaultTasks = [
+        { id: 'd-1', name: 'Organizar primera reunión', responsible: 'Coordinador', status: 'pending' },
+        { id: 'd-2', name: 'Definir objetivos del proyecto', responsible: 'Todos', status: 'pending' },
+        { id: 'd-3', name: 'Reparto de responsabilidades', responsible: 'Todos', status: 'pending' },
+    ];
+
+    const [tasks, setTasks] = useState(tasksByGroup[groupName] || defaultTasks);
 
     const statusLabels = {
         'pending': 'Pendiente',

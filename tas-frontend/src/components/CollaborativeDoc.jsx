@@ -69,7 +69,23 @@ Enfoque de investigación mixto...
         }
     };
 
-    const currentDoc = docsByGroup[groupName] || docsByGroup['Taller de Aplicaciones'];
+    const defaultDoc = {
+        content: `# Nuevo Documento: ${groupName || 'Proyecto'}
+        
+        ## Descripción
+        Comienza a redactar la descripción de tu proyecto aquí.
+        
+        ## Integrantes
+        - [ ] Listar integrantes
+        
+        ## Tareas pendientes
+        - [ ] Primera entrega`,
+        activeUsers: [
+            { id: 'me', name: 'Yo', color: '#3b82f6' }
+        ]
+    };
+
+    const currentDoc = docsByGroup[groupName] || defaultDoc;
     const [content, setContent] = useState(currentDoc.content);
     const activeUsers = currentDoc.activeUsers;
 
