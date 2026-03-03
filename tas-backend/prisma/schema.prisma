@@ -7,20 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  MEMBER
-}
-
 model User {
   id           String        @id @default(uuid()) @db.Uuid
   email        String        @unique
   passwordHash String
   name         String
   role         Role          @default(MEMBER)
-  groupId      String        @default("default")
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  groupId      String        @default("default")
   messages     ChatMessage[]
 }
 
@@ -28,11 +23,26 @@ model Document {
   id        String   @id @default(uuid()) @db.Uuid
   title     String
   content   Json
-  ownerId   String   @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  ownerId   String   @db.Uuid
+  projectId String?  @db.Uuid
+  project   Project? @relation(fields: [projectId], references: [id])
 
   @@index([ownerId])
+  @@index([projectId])
+}
+
+model Project {
+  id          String     @id @default(uuid()) @db.Uuid
+  name        String
+  description String?
+  groupId     String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  documents   Document[]
+
+  @@index([groupId])
 }
 
 model ChatMessage {
@@ -40,8 +50,13 @@ model ChatMessage {
   roomId    String
   content   String
   userId    String   @db.Uuid
-  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 
   @@index([roomId])
+}
+
+enum Role {
+  ADMIN
+  MEMBER
 }
