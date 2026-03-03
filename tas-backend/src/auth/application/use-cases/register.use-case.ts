@@ -23,6 +23,7 @@ export class RegisterUseCase {
             email: dto.email,
             passwordHash,
             name: dto.name,
+            groupId: dto.groupId,
         });
 
         const payload = { sub: user.id, email: user.email, role: user.role };

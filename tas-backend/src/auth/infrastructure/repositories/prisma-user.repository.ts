@@ -19,12 +19,13 @@ export class PrismaUserRepository implements UserRepository {
         return this.mapToEntity(user);
     }
 
-    async create(data: { email: string; passwordHash: string; name: string }): Promise<User> {
+    async create(data: { email: string; passwordHash: string; name: string, groupId?: string }): Promise<User> {
         const user = await this.prisma.user.create({
             data: {
                 email: data.email,
                 passwordHash: data.passwordHash,
                 name: data.name,
+                ...(data.groupId && { groupId: data.groupId }),
             },
         });
         return this.mapToEntity(user);
@@ -37,6 +38,7 @@ export class PrismaUserRepository implements UserRepository {
             prismaUser.passwordHash,
             prismaUser.name,
             prismaUser.role,
+            prismaUser.groupId,
             prismaUser.createdAt,
             prismaUser.updatedAt,
         );

@@ -5,6 +5,7 @@ export class User {
         public passwordHash: string,
         public name: string,
         public role: 'ADMIN' | 'MEMBER',
+        public groupId: string,
         public readonly createdAt: Date,
         public readonly updatedAt: Date,
     ) { }
