@@ -1,0 +1,23 @@
+services:
+  backend:
+    build:
+      context: ./tas-backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./tas-backend/.env
+    restart: always
+
+  frontend:
+    build:
+      context: ./tas-frontend
+      dockerfile: Dockerfile
+      args:
+        # Use the VITE_API_URL from the command line or defaults to localhost
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:3000}
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
