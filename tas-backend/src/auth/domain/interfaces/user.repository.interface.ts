@@ -6,4 +6,5 @@ export interface UserRepository {
     findByEmail(email: string): Promise<User | null>;
     findById(id: string): Promise<User | null>;
     create(data: { email: string; passwordHash: string; name: string; groupId?: string }): Promise<User>;
+    findByGroupId(groupId: string): Promise<User[]>;
 }

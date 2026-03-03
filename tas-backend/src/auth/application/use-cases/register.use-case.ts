@@ -26,7 +26,7 @@ export class RegisterUseCase {
             groupId: dto.groupId,
         });
 
-        const payload = { sub: user.id, email: user.email, role: user.role };
+        const payload = { sub: user.id, email: user.email, role: user.role, groupId: user.groupId, name: user.name };
         return { access_token: this.jwtService.sign(payload) };
     }
 }

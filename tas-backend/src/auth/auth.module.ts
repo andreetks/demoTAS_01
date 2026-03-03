@@ -6,6 +6,7 @@ import { JwtAuthGuard } from './infrastructure/guards/jwt.guard';
 import { AuthController } from './presentation/controllers/auth.controller';
 import { RegisterUseCase } from './application/use-cases/register.use-case';
 import { LoginUseCase } from './application/use-cases/login.use-case';
+import { ListUsersUseCase } from './application/use-cases/list-users.use-case';
 import { PrismaUserRepository } from './infrastructure/repositories/prisma-user.repository';
 import { USER_REPOSITORY } from './domain/interfaces/user.repository.interface';
 import { SharedModule } from '../shared/shared.module';
@@ -25,11 +26,12 @@ import { SharedModule } from '../shared/shared.module';
         JwtAuthGuard,
         RegisterUseCase,
         LoginUseCase,
+        ListUsersUseCase,
         {
             provide: USER_REPOSITORY,
             useClass: PrismaUserRepository,
         },
     ],
-    exports: [JwtModule, JwtAuthGuard],
+    exports: [JwtModule, JwtAuthGuard, ListUsersUseCase],
 })
 export class AuthModule { }

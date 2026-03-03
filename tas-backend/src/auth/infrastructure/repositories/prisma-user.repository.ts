@@ -31,6 +31,13 @@ export class PrismaUserRepository implements UserRepository {
         return this.mapToEntity(user);
     }
 
+    async findByGroupId(groupId: string): Promise<User[]> {
+        const users = await this.prisma.user.findMany({
+            where: { groupId }
+        });
+        return users.map(user => this.mapToEntity(user));
+    }
+
     private mapToEntity(prismaUser: any): User {
         return new User(
             prismaUser.id,
