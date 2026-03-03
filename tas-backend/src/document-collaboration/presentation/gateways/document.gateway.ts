@@ -8,62 +8,83 @@ import {
     MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { UseGuards } from '@nestjs/common';
 import { CollaborationService } from '../../application/services/collaboration.service';
-import { DocumentOperation } from '../../domain/models/document-operation.model';
-import { WsJwtGuard } from '../guards/ws-jwt.guard';
+import { JwtService } from '@nestjs/jwt';
 
-@WebSocketGateway({ namespace: '/documents', cors: true })
+@WebSocketGateway({ namespace: '/documents', cors: { origin: '*' } })
 export class DocumentGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
 
-    constructor(private readonly collaborationService: CollaborationService) { }
+    constructor(
+        private readonly collaborationService: CollaborationService,
+        private readonly jwtService: JwtService,
+    ) { }
 
-    handleConnection(client: Socket) {
-        // connection logic (if needed)
+    async handleConnection(client: Socket) {
+        try {
+            const token = client.handshake.auth?.token || client.handshake.headers?.authorization?.replace('Bearer ', '');
+            if (!token) {
+                client.disconnect();
+                return;
+            }
+            const payload = this.jwtService.verify(token);
+            (client as any).user = { id: payload.sub, email: payload.email, name: payload.name || payload.email };
+        } catch (error) {
+            client.disconnect();
+        }
     }
 
     handleDisconnect(client: Socket) {
-        // disconnection logic (if needed)
+        // Cleanup handled by leave_document events
     }
 
-    @UseGuards(WsJwtGuard)
     @SubscribeMessage('join_document')
-    handleJoinDocument(
+    async handleJoinDocument(
         @ConnectedSocket() client: Socket,
         @MessageBody() payload: { documentId: string },
     ) {
-        const userId = (client as any).user.id;
-        this.collaborationService.joinDocumentRoom(client, payload.documentId, userId);
-        return { event: 'joined_document', data: { documentId: payload.documentId } };
+        const user = (client as any).user;
+        if (!user) return;
+
+        const result = await this.collaborationService.joinDocumentRoom(
+            client,
+            payload.documentId,
+            { id: user.id, name: user.name },
+        );
+
+        return { event: 'document_loaded', data: result };
     }
 
-    @UseGuards(WsJwtGuard)
     @SubscribeMessage('leave_document')
-    handleLeaveDocument(
+    async handleLeaveDocument(
         @ConnectedSocket() client: Socket,
         @MessageBody() payload: { documentId: string },
     ) {
-        const userId = (client as any).user.id;
-        this.collaborationService.leaveDocumentRoom(client, payload.documentId, userId);
+        const user = (client as any).user;
+        if (!user) return;
+
+        await this.collaborationService.leaveDocumentRoom(client, payload.documentId, user.id);
         return { event: 'left_document', data: { documentId: payload.documentId } };
     }
 
-    @UseGuards(WsJwtGuard)
-    @SubscribeMessage('send_operation')
-    handleSendOperation(
+    @SubscribeMessage('update_content')
+    handleUpdateContent(
         @ConnectedSocket() client: Socket,
-        @MessageBody() payload: Omit<DocumentOperation, 'userId' | 'timestamp'>,
+        @MessageBody() payload: { documentId: string; content: string },
     ) {
-        const userId = (client as any).user.id;
+        const user = (client as any).user;
+        if (!user) return;
 
-        const operation: DocumentOperation = {
-            ...payload,
-            userId,
-            timestamp: new Date(),
-        };
+        this.collaborationService.handleContentUpdate(client, payload.documentId, payload.content, user.id);
+    }
 
-        this.collaborationService.broadcastOperation(client, operation);
+    @SubscribeMessage('save_document')
+    async handleSaveDocument(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() payload: { documentId: string },
+    ) {
+        await this.collaborationService.saveDocument(payload.documentId);
+        return { event: 'document_saved', data: { documentId: payload.documentId } };
     }
 }

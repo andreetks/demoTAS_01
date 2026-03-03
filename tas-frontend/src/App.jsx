@@ -99,7 +99,7 @@ function App() {
       )}
 
       {currentScreen === 'document' && (
-        <CollaborativeDoc groupName={activeProject?.name} onBack={handleBackToGroupView} />
+        <CollaborativeDoc projectId={activeProject?.id} groupName={activeProject?.name} onBack={handleBackToGroupView} />
       )}
 
       {currentScreen === 'chat' && (
