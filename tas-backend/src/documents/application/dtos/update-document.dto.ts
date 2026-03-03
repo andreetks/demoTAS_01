@@ -5,7 +5,9 @@ export class UpdateDocumentDto {
     @IsOptional()
     title?: string;
 
-    @IsString()
     @IsOptional()
-    content?: string;
+    content?: any;
+
+    @IsOptional()
+    projectId?: string;
 }

@@ -17,10 +17,7 @@ export class UpdateDocumentUseCase {
             throw new NotFoundException('Document not found');
         }
 
-        if (document.ownerId !== ownerId) {
-            throw new ForbiddenException('You can only edit your own documents');
-        }
-
+        // Allow any authenticated user to edit (collaborative editing)
         return this.documentRepository.update(id, updateDocumentDto);
     }
 }

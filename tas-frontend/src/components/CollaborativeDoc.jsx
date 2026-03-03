@@ -11,12 +11,19 @@ export default function CollaborativeDoc({ projectId, groupName, onBack }) {
     const [activeUsers, setActiveUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [saved, setSaved] = useState(false);
     const [showNewDocForm, setShowNewDocForm] = useState(false);
     const [newDocTitle, setNewDocTitle] = useState('');
     const [error, setError] = useState('');
     const socketRef = useRef(null);
     const isRemoteUpdate = useRef(false);
     const saveTimeoutRef = useRef(null);
+    const contentRef = useRef('');
+
+    // Keep contentRef in sync with state
+    useEffect(() => {
+        contentRef.current = content;
+    }, [content]);
 
     // Load document list for this project
     useEffect(() => {
@@ -36,34 +43,43 @@ export default function CollaborativeDoc({ projectId, groupName, onBack }) {
         }
     };
 
-    // Connect to WebSocket when a document is selected
+    // Load document content via REST API when a document is selected
     useEffect(() => {
         if (!activeDoc) return;
 
+        // Load content via REST
         const token = localStorage.getItem('token');
+        fetch(`${apiUrl}/documents/${activeDoc.id}`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+        })
+            .then((res) => res.json())
+            .then((doc) => {
+                const rawContent = doc.content;
+                const textContent = typeof rawContent === 'object' && rawContent !== null && rawContent.text !== undefined
+                    ? rawContent.text
+                    : (typeof rawContent === 'string' ? rawContent : '');
+                setContent(textContent);
+                contentRef.current = textContent;
+            })
+            .catch((err) => console.error('Error loading document:', err));
+
+        // Connect WebSocket for live sync only
         const socket = io(`${apiUrl}/documents`, {
             auth: { token },
             transports: ['websocket', 'polling'],
         });
-
         socketRef.current = socket;
 
         socket.on('connect', () => {
-            socket.emit('join_document', { documentId: activeDoc.id }, (response) => {
-                if (response?.data) {
-                    setContent(response.data.content || '');
-                    setActiveUsers(response.data.activeUsers || []);
-                }
-            });
+            socket.emit('join_document', { documentId: activeDoc.id });
         });
 
-        // Receive real-time content updates from other users
         socket.on('content_updated', ({ content: newContent }) => {
             isRemoteUpdate.current = true;
             setContent(newContent);
+            contentRef.current = newContent;
         });
 
-        // User joined the document
         socket.on('user_joined', (user) => {
             setActiveUsers((prev) => {
                 if (prev.find((u) => u.id === user.id)) return prev;
@@ -71,13 +87,8 @@ export default function CollaborativeDoc({ projectId, groupName, onBack }) {
             });
         });
 
-        // User left the document
         socket.on('user_left', ({ userId }) => {
             setActiveUsers((prev) => prev.filter((u) => u.id !== userId));
-        });
-
-        socket.on('connect_error', (err) => {
-            console.error('WebSocket connection error:', err.message);
         });
 
         return () => {
@@ -93,8 +104,8 @@ export default function CollaborativeDoc({ projectId, groupName, onBack }) {
     const handleContentChange = useCallback((e) => {
         const newContent = e.target.value;
         setContent(newContent);
+        contentRef.current = newContent;
 
-        // Don't send if this was a remote update
         if (isRemoteUpdate.current) {
             isRemoteUpdate.current = false;
             return;
@@ -109,24 +120,48 @@ export default function CollaborativeDoc({ projectId, groupName, onBack }) {
         }
 
         // Auto-save after 2 seconds of inactivity
+        setSaved(false);
         if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
         saveTimeoutRef.current = setTimeout(() => {
-            handleSave();
+            saveToServer();
         }, 2000);
+    }, [activeDoc]);
+
+    // Save via REST API — always reads latest content from ref
+    const saveToServer = useCallback(() => {
+        if (!activeDoc) return;
+        setSaving(true);
+        setSaved(false);
+        const token = localStorage.getItem('token');
+        const currentContent = contentRef.current;
+
+        fetch(`${apiUrl}/documents/${activeDoc.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ content: { text: currentContent } }),
+        })
+            .then((res) => {
+                setSaving(false);
+                if (res.ok) {
+                    setSaved(true);
+                    setTimeout(() => setSaved(false), 3000);
+                } else {
+                    console.error('Save failed with status:', res.status);
+                }
+            })
+            .catch((err) => {
+                console.error('Error saving document:', err);
+                setSaving(false);
+            });
     }, [activeDoc]);
 
     // Manual save
     const handleSave = useCallback(() => {
-        if (socketRef.current && activeDoc) {
-            setSaving(true);
-            socketRef.current.emit('save_document', { documentId: activeDoc.id }, () => {
-                setSaving(false);
-                setTimeout(() => setSaving(false), 500);
-            });
-            // Fallback: reset saving state after 2s
-            setTimeout(() => setSaving(false), 2000);
-        }
-    }, [activeDoc]);
+        saveToServer();
+    }, [saveToServer]);
 
     // Create new document
     const handleCreateDocument = async () => {
@@ -149,6 +184,18 @@ export default function CollaborativeDoc({ projectId, groupName, onBack }) {
 
     // Go back to document list
     const handleBackToList = () => {
+        // Save before leaving
+        if (activeDoc && contentRef.current) {
+            const token = localStorage.getItem('token');
+            fetch(`${apiUrl}/documents/${activeDoc.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ content: { text: contentRef.current } }),
+            }).catch(() => { });
+        }
         setActiveDoc(null);
         setContent('');
         setActiveUsers([]);
@@ -256,7 +303,7 @@ export default function CollaborativeDoc({ projectId, groupName, onBack }) {
                 </button>
                 <div className="chat-header-info">
                     <h3>{activeDoc.title}</h3>
-                    <p>{saving ? '💾 Guardando...' : '✅ Sincronizado'}</p>
+                    <p>{saving ? '💾 Guardando...' : saved ? '✅ Guardado!' : '📝 Editando'}</p>
                 </div>
                 <div className="active-users">
                     {activeUsers.map((user) => (
@@ -287,13 +334,15 @@ export default function CollaborativeDoc({ projectId, groupName, onBack }) {
                     )}
                     <button
                         onClick={handleSave}
+                        disabled={saving}
                         style={{
-                            marginLeft: 'auto', padding: '6px 14px', background: '#3b82f6',
-                            color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer',
-                            fontSize: '13px', fontWeight: '500',
+                            marginLeft: 'auto', padding: '6px 14px',
+                            background: saving ? '#94a3b8' : saved ? '#10b981' : '#3b82f6',
+                            color: '#fff', border: 'none', borderRadius: '6px', cursor: saving ? 'not-allowed' : 'pointer',
+                            fontSize: '13px', fontWeight: '500', transition: 'background 0.2s',
                         }}
                     >
-                        💾 Guardar
+                        {saving ? '⏳ Guardando...' : saved ? '✅ Guardado!' : '💾 Guardar'}
                     </button>
                 </div>
                 <textarea
