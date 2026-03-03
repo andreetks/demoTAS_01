@@ -9,7 +9,10 @@ export class ListDocumentsUseCase {
         private readonly documentRepository: DocumentRepository,
     ) { }
 
-    async execute(ownerId: string): Promise<Document[]> {
+    async execute(ownerId: string, projectId?: string): Promise<Document[]> {
+        if (projectId) {
+            return this.documentRepository.findByProjectId(projectId);
+        }
         return this.documentRepository.findByOwnerId(ownerId);
     }
 }

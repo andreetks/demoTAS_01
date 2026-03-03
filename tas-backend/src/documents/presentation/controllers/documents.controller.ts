@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards, Request, Query } from '@nestjs/common';
 import { CreateDocumentUseCase } from '../../application/use-cases/create-document.use-case';
 import { GetDocumentUseCase } from '../../application/use-cases/get-document.use-case';
 import { ListDocumentsUseCase } from '../../application/use-cases/list-documents.use-case';
@@ -29,9 +29,9 @@ export class DocumentsController {
     }
 
     @Get()
-    async list(@Request() req) {
+    async list(@Request() req, @Query('projectId') projectId?: string) {
         const userId = req.user.id;
-        return this.listDocumentsUseCase.execute(userId);
+        return this.listDocumentsUseCase.execute(userId, projectId);
     }
 
     @Get(':id')

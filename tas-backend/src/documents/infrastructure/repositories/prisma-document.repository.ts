@@ -14,6 +14,7 @@ export class PrismaDocumentRepository implements DocumentRepository {
                 title: data.title,
                 content: data.content,
                 ownerId: data.ownerId,
+                projectId: data.projectId,
             },
         });
         return this.mapToEntity(created);
@@ -35,12 +36,20 @@ export class PrismaDocumentRepository implements DocumentRepository {
         return documents.map(doc => this.mapToEntity(doc));
     }
 
+    async findByProjectId(projectId: string): Promise<Document[]> {
+        const documents = await this.prisma.document.findMany({
+            where: { projectId },
+        });
+        return documents.map(doc => this.mapToEntity(doc));
+    }
+
     async update(id: string, data: Partial<Document>): Promise<Document> {
         const updated = await this.prisma.document.update({
             where: { id },
             data: {
                 title: data.title !== undefined ? data.title : undefined,
                 content: data.content !== undefined ? data.content : undefined,
+                projectId: data.projectId !== undefined ? data.projectId : undefined,
             },
         });
         return this.mapToEntity(updated);
@@ -58,6 +67,7 @@ export class PrismaDocumentRepository implements DocumentRepository {
             prismaDocument.title,
             prismaDocument.content,
             prismaDocument.ownerId,
+            prismaDocument.projectId,
             prismaDocument.createdAt,
             prismaDocument.updatedAt,
         );
